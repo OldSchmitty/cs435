@@ -3,10 +3,12 @@ package cs435.regression;
 import com.sun.rowset.internal.Row;
 import org.apache.spark.SparkContext;
 
-import org.apache.spark.ml.regression.LinearRegression;
+import org.apache.spark.ml.feature.VectorAssembler;
+import org.apache.spark.ml.regression.*;
 
-import org.apache.spark.mllib.regression.LinearRegressionModel;
 
+import org.apache.spark.ml.linalg.Vector;
+import org.apache.spark.ml.linalg.Vectors;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
@@ -30,10 +32,14 @@ public class RegressionTest {
             .load(path);
     gameInfo.show();
     gameInfo.printSchema();
+    VectorAssembler assembler = new VectorAssembler()
+          .setInputCols(new String[]{"groupNum", "accountVal"})
+          .setOutputCol("features");
+    LinearRegression lr = new LinearRegression().setLabelCol("accountVal").setFeaturesCol("features");
 
-    LinearRegression lr = new LinearRegression();
-    LinearRegressionModel model = lr.fit(gameInfo);
-
+    LinearRegressionModel model = lr.fit(assembler.transform(gameInfo.select("features")));
+    Vector predictions = Vectors.dense(new double[]{1});
+    System.out.println(model.predict(predictions));
 
 
     /*JavaRDD<LabeledPoint> data = MLUtils.loadLibSVMFile(sc, path).toJavaRDD();
