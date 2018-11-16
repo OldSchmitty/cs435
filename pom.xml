@@ -36,9 +36,14 @@
     <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-mllib -->
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib_2.12</artifactId>
-      <version>2.4.0</version>
+      <artifactId>spark-mllib_2.11</artifactId>
+      <version>2.3.0</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-mllib_2.11</artifactId>
+      <version>2.3.0</version>
     </dependency>
 
 
