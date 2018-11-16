@@ -1,0 +1,9 @@
+Achievement_Percentages appid,Name,Percentage 1
+App_ID_Info appid,Title,Type,Price,Release_Date,Rating,Required_Age,Is_Multiplayer 1
+Friends steamid_a,steamid_b,relationship,friend_since,dateretrieved,LccTag 36
+Games steamid,appid,playtime_2weeks,playtime_forever,dateretrieved 60
+Games_Developers appid,Developer 1
+Games_Genres appid,Genre 1
+Games_Publishers appid,Publisher 1
+Groups steamid,groupid,dateretrieved 4
+Player_Summaries steamid,personaname,profileurl,avatar,avatarmedium,avatarfull,personastate,communityvisibilitystate,profilestate,lastlogoff,commentpermission,realname,primaryclanid,timecreated,gameid,gameserverip,gameextrainfo,cityid,loccountrycode,locstatecode,loccityid,dateretrieved 10
