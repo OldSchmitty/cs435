@@ -1,12 +1,13 @@
 package cs435.regression;
 
+import com.sun.rowset.internal.Row;
 import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.mllib.classification.SVMModel;
-import org.apache.spark.mllib.classification.SVMWithSGD;
-import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics;
-import org.apache.spark.mllib.regression.LabeledPoint;
-import org.apache.spark.mllib.util.MLUtils;
+
+import org.apache.spark.ml.regression.LinearRegression;
+
+import org.apache.spark.mllib.regression.LinearRegressionModel;
+
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
@@ -16,12 +17,26 @@ public class RegressionTest {
     SparkSession spark = SparkSession
         .builder()
         .appName("Whales Vs Shrimp - Regression")
+        .master("local")
         .getOrCreate();
 
     SparkContext sc = spark.sparkContext();
 
-    String path = "data/mllib/sample_libsvm_data.txt";
-    JavaRDD<LabeledPoint> data = MLUtils.loadLibSVMFile(sc, path).toJavaRDD();
+    String path = args[0];
+
+    Dataset gameInfo = spark.read().format("csv")
+            .option("inferSchema", "true")
+            .option("header", "true")
+            .load(path);
+    gameInfo.show();
+    gameInfo.printSchema();
+
+    LinearRegression lr = new LinearRegression();
+    LinearRegressionModel model = lr.fit(gameInfo);
+
+
+
+    /*JavaRDD<LabeledPoint> data = MLUtils.loadLibSVMFile(sc, path).toJavaRDD();
 
     // Split initial RDD into two... [60% training data, 40% testing data].
     JavaRDD<LabeledPoint> training = data.sample(false, 0.6, 11L);
@@ -49,6 +64,7 @@ public class RegressionTest {
 // Save and load model
     model.save(sc, "target/tmp/javaSVMWithSGDModel");
     SVMModel sameModel = SVMModel.load(sc, "target/tmp/javaSVMWithSGDModel");
+    */
   }
 
 
