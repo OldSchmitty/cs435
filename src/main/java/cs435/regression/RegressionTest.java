@@ -1,6 +1,5 @@
 package cs435.regression;
 
-import com.sun.rowset.internal.Row;
 import org.apache.spark.SparkContext;
 
 import org.apache.spark.ml.feature.VectorAssembler;
@@ -10,6 +9,7 @@ import org.apache.spark.ml.regression.*;
 import org.apache.spark.ml.linalg.Vector;
 import org.apache.spark.ml.linalg.Vectors;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import scala.Tuple2;
 
@@ -30,14 +30,14 @@ public class RegressionTest {
             .option("inferSchema", "true")
             .option("header", "true")
             .load(path);
-    gameInfo.show();
-    gameInfo.printSchema();
     VectorAssembler assembler = new VectorAssembler()
-          .setInputCols(new String[]{"groupNum", "accountVal"})
-          .setOutputCol("features");
-    LinearRegression lr = new LinearRegression().setLabelCol("accountVal").setFeaturesCol("features");
+            .setInputCols(new String[]{"groupNum"})
+            .setOutputCol("groupNumVector");
 
-    LinearRegressionModel model = lr.fit(assembler.transform(gameInfo.select("features")));
+    Dataset<Row> vectorData = assembler.transform(gameInfo);
+    vectorData.show();
+    LinearRegression lr = new LinearRegression().setLabelCol("accountVal").setFeaturesCol("groupNumVector");
+    LinearRegressionModel model = lr.fit(vectorData);
     Vector predictions = Vectors.dense(new double[]{1});
     System.out.println(model.predict(predictions));
 
