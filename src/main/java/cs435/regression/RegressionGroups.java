@@ -62,5 +62,20 @@ public class RegressionGroups {
             Vector predictions = Vectors.dense(new double[]{groupSize});    //add all predictions we want here.
             System.out.println("For a group of size " + groupSize + " the predicted average member net worth is " + model.predict(predictions));
         }
+
+        gameInfo = gameInfo.filter("NetWorthOfGroup is not null");
+        //load in file and change for the appropriate columns in real dataset
+        assembler = new VectorAssembler()
+                .setInputCols(new String[]{"NumberOfMembers"})   //number of members in a group
+                .setOutputCol("numOfPlayersVector");          //set to vector for the regression input
+
+        vectorData = assembler.transform(gameInfo);
+        vectorData.show();    //testing output to make sure we got here right
+        lr = new LinearRegression().setLabelCol("NetWorthOfGroup").setFeaturesCol("numOfPlayersVector");
+        model = lr.fit(vectorData);
+        for(double groupSize: predictedMembers){
+            Vector predictions = Vectors.dense(new double[]{groupSize});    //add all predictions we want here.
+            System.out.println("For a group of size " + groupSize + " the predicted group net worth is " + model.predict(predictions));
+        }
     }
 }
