@@ -28,9 +28,12 @@ public class RegressionGroups {
         Dataset gameInfo = spark.read().format("csv")
                 .option("inferSchema", "true")
                 .option("header", "true")
-                .load(path).select("NumberOfMembers", "AverageMemberNetWorth").withColumn("NumberOfMembers", col("NumberOfMembers").cast(LongType));;
+                .load(path);
 
-        gameInfo.filter("NumberOfMembers == 1").summary("count", "mean", "stddev", "min", "max", "1%", "10%", "25%", "50%", "75%", "90%",
+        gameInfo.filter("NumberOfMembers < 1000").summary("count", "mean", "stddev", "min", "max", "1%", "10%", "25%", "50%", "75%", "90%",
+            "99%").show();
+
+        gameInfo.summary("count", "mean", "stddev", "min", "max", "1%", "10%", "25%", "50%", "75%", "90%",
             "99%").show();
 
 
@@ -52,6 +55,8 @@ public class RegressionGroups {
         LinearRegression lr = new LinearRegression().setLabelCol("AverageMemberNetWorth").setFeaturesCol("numOfPlayersVector");
         LinearRegressionModel model = lr.fit(vectorData);
         double[] predictedMembers = new double[]{1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000};
+
+
 
         for(double groupSize: predictedMembers){
             Vector predictions = Vectors.dense(new double[]{groupSize});    //add all predictions we want here.
