@@ -2,13 +2,13 @@
 
 jar='./target/ShrimpsVsWhales-1.0.jar'
 
-playersNetWorthFile='/projectDataCSV/PlayersNetWorth'
-groupFiles='/projectDataCSV/Groups/Groups-r-00000'
+playersAccountInfoFile='/projectDataCSV/PlayerAccountData'
+groupFiles='/projectDataCSV/Groups/'
 
 # change links
 if [ $# -gt 0 ]
   then
-    playersNetWorthFile=$1
+    playersAccountInfoFile=$1
 fi
 
 if [ $# -gt 1 ]
@@ -16,5 +16,5 @@ if [ $# -gt 1 ]
     groupFiles=$2
 fi
 
-
-nice -20 $SPARK_HOME/bin/spark-submit --class cs435.dataproccessing.FindGroupNetWorth --master spark://madison.cs.colostate.edu:30138 --deploy-mode cluster ${jar} ${playersNetWorthFile} ${groupFiles}
+mvn package
+nice -20 $SPARK_HOME/bin/spark-submit --class cs435.dataproccessing.FindGroupNetWorth --master spark://madison.cs.colostate.edu:30138 --deploy-mode cluster ${jar} ${playersAccountInfoFile} ${groupFiles}
