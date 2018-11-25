@@ -1,18 +1,13 @@
 package cs435.regression;
-
 import org.apache.spark.SparkContext;
-
 import org.apache.spark.ml.feature.VectorAssembler;
 import org.apache.spark.ml.regression.*;
-
-
 import org.apache.spark.ml.linalg.Vector;
 import org.apache.spark.ml.linalg.Vectors;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-public class RegressionTest {
-
+public class RegressionUsers {
 
   public static void main(String[] args){
     SparkSession spark = SparkSession
@@ -32,18 +27,14 @@ public class RegressionTest {
 
     //load in file and change for the appropriate columns in real dataset
     VectorAssembler assembler = new VectorAssembler()
-            .setInputCols(new String[]{"groupNum"})   //number of groups user is in
+            .setInputCols(new String[]{"NumberOfGroups"})   //number of groups user is in
             .setOutputCol("groupNumVector");          //set to vector for the regression input
 
     Dataset<Row> vectorData = assembler.transform(gameInfo);
     vectorData.show();    //testing output to make sure we got here right
-    LinearRegression lr = new LinearRegression().setLabelCol("accountVal").setFeaturesCol("groupNumVector");
+    LinearRegression lr = new LinearRegression().setLabelCol("NetWorth").setFeaturesCol("groupNumVector");
     LinearRegressionModel model = lr.fit(vectorData);
-    Vector predictions = Vectors.dense(new double[]{1});    //add all predictions we want here.
+    Vector predictions = Vectors.dense(new double[]{1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000});    //add all predictions we want here.
     System.out.println(model.predict(predictions));
-
   }
-
-
-
 }
