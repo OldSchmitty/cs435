@@ -23,9 +23,9 @@ public class RegressionGroups {
                 .option("inferSchema", "true")
                 .option("header", "true")
                 .load(path);
-        //load in file and change for the appropriate columns in real dataset
+
         VectorAssembler assembler = new VectorAssembler()
-                .setInputCols(new String[]{"NumberOfMembers"})   //number of groups user is in
+                .setInputCols(new String[]{"NumberOfMembers"})   //number of members in a group
                 .setOutputCol("numOfPlayersVector");          //set to vector for the regression input
 
         Dataset<Row> vectorData = assembler.transform(gameInfo);
