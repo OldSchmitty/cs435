@@ -56,6 +56,7 @@ public class RegressionGroups {
         LinearRegressionModel model = lr.fit(vectorData);
         double[] predictedMembers = new double[]{1, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000};
 
+        System.out.println("Coefficients: " + model.coefficients() + " Intercept: " + model.intercept());
 
 
         for(double groupSize: predictedMembers){
@@ -71,8 +72,18 @@ public class RegressionGroups {
 
         vectorData = assembler.transform(gameInfo);
         vectorData.show();    //testing output to make sure we got here right
+        Dataset<Row>[] dataSplit = vectorData.randomSplit(new double[]{0.7, 0.3});
         lr = new LinearRegression().setLabelCol("NetWorthOfGroup").setFeaturesCol("numOfPlayersVector");
-        model = lr.fit(vectorData);
+        model = lr.fit(dataSplit[0]);
+        System.out.println("Coefficients: " + model.coefficients() + " Intercept: " + model.intercept());
+
+        Dataset<Row> results = model.transform(dataSplit[1])
+            .select("NumberOfMembers", "AverageMemberNetWorth", "prediction").withColumn("Dif%",
+                col("AverageMemberNetWorth").minus(col("prediction"))
+                    .divide(col("AverageMemberNetWorth")));
+
+        results.select("Dif%").summary().show();
+
         for(double groupSize: predictedMembers){
             Vector predictions = Vectors.dense(new double[]{groupSize});    //add all predictions we want here.
             System.out.println("For a group of size " + groupSize + " the predicted group net worth is " + model.predict(predictions));
