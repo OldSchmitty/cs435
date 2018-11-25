@@ -1,7 +1,7 @@
 Achievement_Percentages appid,Name,Percentage 1
 App_ID_Info appid,Title,Type,Price,Release_Date,Rating,Required_Age,Is_Multiplayer 1
 Friends steamid_a,steamid_b,relationship,friend_since,dateretrieved,LccTag 36
-Games steamid,appid,playtime_2weeks,playtime_forever,dateretrieved 60
+Games steamid,appid,playtime_2weeks,playtime_forever,dateretrieved 5
 Games_Developers appid,Developer 1
 Games_Genres appid,Genre 1
 Games_Publishers appid,Publisher 1

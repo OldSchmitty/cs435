@@ -2,10 +2,12 @@ package cs435.dataproccessing;
 
 import static org.apache.spark.sql.functions.avg;
 import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.count;
 import static org.apache.spark.sql.functions.sum;
 import static org.apache.spark.sql.types.DataTypes.DoubleType;
 
+import java.util.Arrays;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
@@ -16,90 +18,113 @@ public class FindGroupNetWorth {
   public static void main(String[] args) throws Exception {
 
     if (args.length < 2) {
-      throw new IllegalArgumentException("FindGroupNetWorth:: needs a path <PlayerNetWorth> <GroupInfo>");
+      throw new IllegalArgumentException("FindGroupNetWorth:: needs a path <PlayerAccountInfo> <GroupInfo>");
     }
 
-    String playerNetWorthDir = args[0];
+    // Get file locations
+    String playerAccountInfoDir = args[0];
     String groupInfoDir = args[1];
 
-
-    //FindMostPopularGenre test1 = new FindMostPopularGenre(dataFull);
+    // Start Spark job
     SparkSession spark = SparkSession
         .builder()
-        .appName("Whales Vs Shrimp - NetWorth")
+        .appName("Whales Vs Shrimp - Group Info")
         .getOrCreate();
 
     spark.sparkContext().setLogLevel("ERROR");
 
-
-    Dataset playerNetWorth = spark.read().format("csv")
+    // Read Files
+    Dataset playerAccountInfo = spark.read().format("csv")
         .option("inferSchema", "true")
         .option("header", "true")
-        .load(playerNetWorthDir);
+        .load(playerAccountInfoDir)
+        .select("steamid", "NumberOfGamesOwned", "TotalPlayTime", "NetWorth");
 
     Dataset groupInfo = spark.read().format("csv")
         .option("inferSchema", "true")
         .option("header", "true")
-        .load(groupInfoDir);
+        .load(groupInfoDir)
+        .select("steamid", "groupid");
 
-
-    System.out.println("There are " + playerNetWorth.count() + " player's with a calculated net worth in the file");
-    playerNetWorth.show(10);
-    playerNetWorth.printSchema();
+    // Check to see if data was read properly
+    System.out.println("There are " + playerAccountInfo.count() + " player's with a calculated net worth in the file");
+    playerAccountInfo.show(10);
+    playerAccountInfo.printSchema();
 
     System.out.println("There are " + groupInfo.count() + " group items in the file");
     groupInfo.show(10);
     groupInfo.printSchema();
 
-    Dataset playerGroups = groupInfo.select("steamid", "groupid").join(playerNetWorth, "steamid");
+
+    // Join the group data and the net worth of all the members
+    Dataset playerGroups = groupInfo.join(playerAccountInfo, "steamid");
 
     playerGroups.show(10);
     playerGroups.summary();
 
+    // Find the groups total net worth and average users net worth
     Dataset<Row> groupNetWorth = playerGroups.groupBy("groupid")
-        .agg(count("steamid"), sum("NetWorth"), avg("NetWorth"))
-        .withColumn("AverageMemberNetWorth", col("avg(NetWorth)"))
-        .withColumn("NetWorthOfGroup",col("sum(NetWorth)"))
-        .withColumn("NumberOfMembers",col("count(steamid)"))
-        .drop("count(steamid)", "sum(NetWorth)", " avg(NetWorth)");
+        .agg(count("steamid").alias("NumberOfMembers"),
+            avg("NetWorth").alias("AverageMemberNetWorth"),
+            sum("NetWorth").alias("NetWorthOfGroup"),
+            avg("NumberOfGamesOwned").alias("AverageNumberOfGames"),
+            sum("NumberOfGamesOwned").alias("TotalNumberOfGames"),
+            avg("TotalPlayTime").alias("AverageTotalPlayTime"),
+            sum("TotalPlayTime").alias("TotalPlayTime"));
 
     groupNetWorth.orderBy(col("NumberOfMembers").desc()).show(30);
+    groupNetWorth.orderBy(col("AverageMemberNetWorth").desc()).show(30);
+    groupNetWorth.orderBy(col("NetWorthOfGroup").desc()).show(30);
     groupNetWorth.select("AverageMemberNetWorth", "NetWorthOfGroup", "NumberOfMembers").summary().show();
 
 
 
 
-    /*
-
-    gamePrices.select("Price").summary().show();
-
-
-    userGames = userGames.select(col("steamid"), col("appid"));
-
-    userGames = userGames.join(gamePrices, "appid");
-
-    Dataset<Row> userNetWorth = userGames.groupBy("steamid")
-        .agg(count("appid"), sum("Price")).withColumn("NumberOfGames", col("count(appid)"))
-        .withColumn("NetWorth",col("sum(Price)")).drop("count(appid)", "sum(Price)");
-
-    userNetWorth.show(20);
-
-    Dataset<Row> netWorthSum = userNetWorth.select("NumberOfGames", "NetWorth").
-        summary("count", "mean", "stddev", "min", "max", "1%", "10%", "25%", "50%", "75%", "90%",
-            "99%");
-
-    netWorthSum.show(20);
-
-    userNetWorth.coalesce(1).write()
+    groupNetWorth.coalesce(10).write()
         .mode(SaveMode.Overwrite).format("com.databricks.spark.csv")
         .option("header", "true")
-        .save("steamProject/PlayerNetWorth");
+        .save("steamProject/GroupNetWorth");
 
-    netWorthSum.coalesce(1).write()
+
+    // Find how many groups a user is in
+
+    Dataset<Row> userGroups = playerGroups.groupBy("steamid")
+        .agg(count("groupid").alias("NumberOfGroups")).join(playerAccountInfo, "steamid");
+
+    userGroups.show();
+
+
+    userGroups.coalesce(10).write()
         .mode(SaveMode.Overwrite).format("com.databricks.spark.csv")
         .option("header", "true")
-        .save("steamProject/PlayerNetWorthSum");
-        */
+        .save("steamProject/UsersNumberOfGroups");
+
+
+    // Store what SteamId's belong to a group
+    Dataset<Row> groupMembers = playerGroups.groupBy("groupid")
+        .agg(collect_list("steamid").alias("Members"), count("steamid").alias("NumberOfMembers"));
+    groupMembers.show();
+    groupMembers.printSchema();
+
+
+    groupMembers.coalesce(10).write()
+        .mode(SaveMode.Overwrite)
+        .save("steamProject/GroupsPlayers");
+
+
+    // Store what Groups a Steam Id belongs to
+    Dataset<Row> playersGroups = playerGroups.groupBy("steamid")
+        .agg(collect_list("groupid").alias("groups"), count("groupid").alias("NumberOfGroups"));
+
+    playersGroups.show();
+    playerGroups.printSchema();
+
+
+    playersGroups.coalesce(10).write()
+        .mode(SaveMode.Overwrite)
+        .save("steamProject/PlayersGroups");
+
+
   }
 
 }
