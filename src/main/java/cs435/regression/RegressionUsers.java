@@ -25,7 +25,6 @@ public class RegressionUsers {
             .option("header", "true")
             .load(path);
 
-    //load in file and change for the appropriate columns in real dataset
     VectorAssembler assembler = new VectorAssembler()
             .setInputCols(new String[]{"NumberOfGroups"})   //number of groups user is in
             .setOutputCol("groupNumVector");          //set to vector for the regression input
