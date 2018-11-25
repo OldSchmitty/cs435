@@ -18,7 +18,7 @@ public class RegressionTest {
   public static void main(String[] args){
     SparkSession spark = SparkSession
         .builder()
-        .appName("Whales Vs Shrimp - Regression")
+        .appName("Whales Vs Shrimp - Regression kamil")
         .master("local")
         .getOrCreate();
 
