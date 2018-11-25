@@ -13,7 +13,7 @@ public class RegressionUsers {
     SparkSession spark = SparkSession
         .builder()
         .appName("Whales Vs Shrimp - Regression")
-        .master("local")
+        //.master("local")
         .getOrCreate();
 
     SparkContext sc = spark.sparkContext();

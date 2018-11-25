@@ -4,7 +4,7 @@ jar='./target/ShrimpsVsWhales-1.0.jar'
 
 gameInfoFiles='/projectDataCSV/App_ID_Info/'
 gameGenreFiles='/projectDataCSV/Games_Genres/'
-playerInfoFiles='/projectDataCSV/Games/Games-r-00004'
+playerInfoFiles='/projectDataCSV/Games/'
 
 # change links
 if [ $# -gt 0 ]

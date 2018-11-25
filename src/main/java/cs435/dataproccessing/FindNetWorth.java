@@ -62,6 +62,7 @@ public class FindNetWorth {
 
 
     /*
+    // Count takes 5+ mins
     // Check to see if data was read properly
     System.out.println("There are " + userGames.count() + " player games in the file");
     userGames.show(10);
