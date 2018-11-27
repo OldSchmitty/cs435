@@ -10,20 +10,21 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
+/**
+ * This class finds the basic breakdown of play net worth
+ */
 public class FindPlayerGameInfo {
 
 
   public static void main(String[] args) throws Exception {
 
     if (args.length < 2) {
-      throw new IllegalArgumentException("FindNetWorth:: needs a path <PlayerGames> <GameInfo>");
+      throw new IllegalArgumentException("FindPlayerGameInfo:: needs a path <PlayerGames> <GameInfo>");
     }
 
     String playerGamesDir = args[0];
     String gameInfoDir = args[1];
 
-
-    //FindMostPopularGenre test1 = new FindMostPopularGenre(dataFull);
     SparkSession spark = SparkSession
         .builder()
         .appName("Whales Vs Shrimp - NetWorth")
@@ -41,6 +42,7 @@ public class FindPlayerGameInfo {
         .option("inferSchema", "true")
         .option("header", "true")
         .load(gameInfoDir);
+
 
 
     System.out.println("There are " + userGames.count() + " player games in the file");

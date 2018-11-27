@@ -5,9 +5,7 @@ import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.count;
 import static org.apache.spark.sql.functions.sum;
-import static org.apache.spark.sql.types.DataTypes.DoubleType;
 
-import java.util.Arrays;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;

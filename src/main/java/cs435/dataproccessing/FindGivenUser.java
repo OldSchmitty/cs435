@@ -3,6 +3,9 @@ package cs435.dataproccessing;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
 
+/**
+ * This class finds a users statistics if with their steamid
+ */
 public class FindGivenUser {
 
   public static void main(String[] args) throws Exception {
