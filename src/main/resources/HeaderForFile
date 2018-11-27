@@ -1,3 +1,4 @@
+# Headers for converting SQL calls to CSV
 Achievement_Percentages appid,Name,Percentage 1
 App_ID_Info appid,Title,Type,Price,Release_Date,Rating,Required_Age,Is_Multiplayer 1
 Friends steamid_a,steamid_b,relationship,friend_since,dateretrieved,LccTag 36

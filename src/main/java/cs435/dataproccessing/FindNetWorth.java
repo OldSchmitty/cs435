@@ -9,7 +9,6 @@ import static org.apache.spark.sql.types.DataTypes.DoubleType;
 
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.types.DataTypes;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SparkSession;
@@ -61,7 +60,7 @@ public class FindNetWorth {
         .load(genreInfoDir);
 
 
-    /*
+
     // Count takes 5+ mins
     // Check to see if data was read properly
     System.out.println("There are " + userGames.count() + " player games in the file");
@@ -75,18 +74,13 @@ public class FindNetWorth {
     System.out.println("There are " + userInfo.count() + " users in the file and " + userInfo.filter(col("timecreated").equalTo("NULL")).count() + " players with no creation date");
     userInfo.show(10);
     userInfo.printSchema();
-    */
+
 
     // Change price from string to double
     Dataset gamePrices = gameInfo.select(col("appid"), col("Price"))
         .withColumn("Price", col("Price").cast(DoubleType));
     gamePrices.show(10);
     gamePrices.printSchema();
-
-
-
-
-
 
     // Get data from the users games
     userGames = userGames.select(col("steamid"), col("appid"), col("playtime_forever"));
