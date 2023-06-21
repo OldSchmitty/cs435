@@ -1,2 +1,2 @@
 # cs435 Big Data
-# Neural Network for prediciting spending patterns on Steam.
+Neural Network for prediciting spending patterns on Steam.
